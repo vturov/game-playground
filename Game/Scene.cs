@@ -1,6 +1,7 @@
 ﻿using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Diagnostics;
+using System.Numerics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using Color = System.Drawing.Color;
@@ -74,8 +75,10 @@ namespace Game
             out float redColor;
             out vec2 texCoord;
 
+            uniform mat4 transform;
+
             void main() {
-                gl_Position = vec4(pos, 1);
+                gl_Position = transform * vec4(pos, 1);
                 redColor = red;
                 texCoord = tex;
             }";
@@ -159,7 +162,7 @@ namespace Game
             context.ClearColor(Color.CadetBlue);
 
             context.UseProgram(shaderProgram);
-            
+
             context.ActiveTexture(TextureUnit.Texture0);
             context.BindTexture(TextureTarget.Texture2D, texture1);
             context.ActiveTexture(TextureUnit.Texture1);
@@ -167,6 +170,13 @@ namespace Game
 
             context.Uniform1(0, 0);
             context.Uniform1(1, 1);
+
+            var now = DateTime.Now;
+            var viewMatrix = Matrix4x4.CreateRotationX(0.14f) *
+                             Matrix4x4.CreateScale(0.7f * (now.Millisecond / 1000f)) *
+                             Matrix4x4.CreateTranslation(now.Millisecond / 1000f, 0, 0);
+            var matrixLocation = context.GetUniformLocation(shaderProgram, "transform");
+            context.UniformMatrix4(matrixLocation, 1, false, (float*)&viewMatrix);
 
             context.BindVertexArray(vao);
             context.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, null);

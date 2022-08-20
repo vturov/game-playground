@@ -11,7 +11,8 @@ namespace Game
             return services
                 .AddSingleton<IHostedService, ApplicationHost>()
                 .AddSingleton(Window.Create(WindowOptions.Default))
-                .AddSingleton<IRenderer, Renderer>();
+                .AddSingleton<IRenderer, Renderer>()
+                .AddScoped<Scene>();
         }
     }
 }

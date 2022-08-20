@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using Silk.NET.OpenGL;
+﻿using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
 namespace Game
@@ -9,13 +8,21 @@ namespace Game
         private IWindow? window;
         private GL? context;
 
+        private readonly Scene scene;
+
+        public Renderer(Scene scene)
+        {
+            this.scene = scene;
+        }
+
         public void Initialize(IWindow window)
         {
             if (this.window is not null)
                 throw new InvalidOperationException("Double initialization detected");
 
             this.window = window;
-            this.context = window.CreateOpenGL();
+            context = window.CreateOpenGL();
+            scene.Initialize(context);
 
             window.Render += OnWindowRender;
             window.Closing += OnWindowClosing;
@@ -23,13 +30,12 @@ namespace Game
 
         private void OnWindowRender(double delta)
         {
-            context.ClearColor(Color.CadetBlue);
-            context.Clear(ClearBufferMask.ColorBufferBit);
+            scene.Draw(context!);
         }
 
         private void OnWindowClosing()
         {
-            window.Render -= OnWindowRender;
+            window!.Render -= OnWindowRender;
             window.Closing -= OnWindowClosing;
         }
     }

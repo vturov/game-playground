@@ -1,11 +1,17 @@
-﻿namespace Game
+﻿using Microsoft.Extensions.Hosting;
+
+namespace Game
 {
     internal class Program
     {
         private static void Main(string[] args)
         {
-            using var app = new Application();
-            app.Run(args);
+            using var host = Host
+                .CreateDefaultBuilder(args)
+                .ConfigureServices((_, services) => services.AddApplicationCore())
+                .Build();
+
+            host.Start();
         }
     }
 }

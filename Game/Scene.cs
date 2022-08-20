@@ -10,25 +10,37 @@ namespace Game
         {
             -0.5f, -0.5f, 0,
             0.5f, -0.5f, 0,
-            0, 0.5f, 0
+            -0.5f, 0.5f, 0,
+            0.5f, 0.5f, 0,
+        };
+
+        private readonly uint[] indices =
+        {
+            0, 1, 2,
+            1, 3, 2
         };
 
         private uint vbo;
+        private uint ebo;
         private uint vao;
         private uint shaderProgram;
 
         public unsafe void Initialize(GL context)
         {
             vbo = context.GenBuffer();
+            ebo = context.GenBuffer();
             vao = context.GenVertexArray();
 
             context.BindVertexArray(vao);
-
             context.BindBuffer(BufferTargetARB.ArrayBuffer, vbo);
             context.BufferData(BufferTargetARB.ArrayBuffer, new ReadOnlySpan<float>(vertices), BufferUsageARB.StaticDraw);
 
+            context.BindBuffer(BufferTargetARB.ElementArrayBuffer, ebo);
+            context.BufferData(BufferTargetARB.ElementArrayBuffer, new ReadOnlySpan<uint>(indices), BufferUsageARB.StaticDraw);
+
             context.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), null);
             context.EnableVertexAttribArray(0);
+            context.BindVertexArray(0);
 
             var vs = @"
             #version 330 core
@@ -69,14 +81,15 @@ namespace Game
             context.DeleteShader(fragmentShader);
         }
 
-        public void Draw(GL context)
+        public unsafe void Draw(GL context)
         {
             context.Clear(ClearBufferMask.ColorBufferBit);
             context.ClearColor(Color.CadetBlue);
 
             context.UseProgram(shaderProgram);
             context.BindVertexArray(vao);
-            context.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            context.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, null);
+            context.BindVertexArray(0);
         }
     }
 }

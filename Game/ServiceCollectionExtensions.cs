@@ -10,7 +10,8 @@ namespace Game
         {
             return services
                 .AddSingleton<IHostedService, ApplicationHost>()
-                .AddSingleton(Window.Create(WindowOptions.Default));
+                .AddSingleton(Window.Create(WindowOptions.Default))
+                .AddSingleton<IRenderer, Renderer>();
         }
     }
 }

@@ -1,40 +1,25 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Silk.NET.Windowing;
 
 namespace Game
 {
-    internal sealed class ApplicationHost : IHostedService, IDisposable
+    internal sealed class ApplicationHost : IHostedService
     {
-        private readonly IWindow window;
-        private readonly IRenderer renderer;
-
-        public ApplicationHost(IWindow window, IRenderer renderer)
+        public ApplicationHost(IGame game, IHostApplicationLifetime lifetime)
         {
-            this.window = window;
-            this.renderer = renderer;
+            game.Exited += lifetime.StopApplication;
+
+            lifetime.ApplicationStarted.Register(game.Start);
+            lifetime.ApplicationStopping.Register(game.Shutdown);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            window.Load += OnWindowLoaded;
-            window.Run();
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            window.Dispose();
-        }
-
-        private void OnWindowLoaded()
-        {
-            window.Load -= OnWindowLoaded;
-            renderer.Initialize(window);
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
 namespace Game
@@ -10,9 +11,12 @@ namespace Game
         {
             return services
                 .AddSingleton<IHostedService, ApplicationHost>()
+                .AddSingleton<IGame, Game>()
                 .AddSingleton(Window.Create(WindowOptions.Default))
-                .AddSingleton<IRenderer, Renderer>()
-                .AddScoped<Scene>();
+                .AddSingleton(provider => provider.GetRequiredService<IWindow>().CreateOpenGL())
+                .AddSingleton<ISceneManager, SceneManager>()
+                .AddSingleton<ISceneDrawer, SceneDrawer>()
+                .AddSingleton<Func<ISceneDrawer>>(provider => provider.GetRequiredService<ISceneDrawer>);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Game
                 .ConfigureServices((_, services) => services.AddApplicationCore())
                 .Build();
 
-            host.Start();
+            host.Run();
         }
     }
 }

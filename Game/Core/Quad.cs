@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -36,18 +35,19 @@ internal sealed class Quad : IDrawableGameObject
     };
 
     private readonly GL context;
+    private readonly ShaderProgram shader;
 
     private bool isInitialized;
     private uint vbo;
     private uint ebo;
     private uint vao;
-    private uint shaderProgram;
     private uint texture1;
     private uint texture2;
 
-    public Quad(GL context)
+    public Quad(GL context, ShaderProgram shader)
     {
         this.context = context;
+        this.shader = shader;
     }
 
     public unsafe void Initialize()
@@ -74,61 +74,6 @@ internal sealed class Quad : IDrawableGameObject
 
         context.BindVertexArray(0);
 
-        var vs = @"
-            #version 330 core
-            layout (location = 0) in vec3 pos;
-            layout (location = 1) in float red;
-            layout (location = 2) in vec2 tex;
-
-            out float redColor;
-            out vec2 texCoord;
-
-            uniform mat4 model;
-            uniform mat4 view;
-            uniform mat4 projection;
-
-            void main() {
-                gl_Position = projection * view * model * vec4(pos, 1);
-                redColor = red;
-                texCoord = tex;
-            }";
-
-        var vertexShader = context.CreateShader(ShaderType.VertexShader);
-        context.ShaderSource(vertexShader, vs);
-        context.CompileShader(vertexShader);
-        Debug.Write(context.GetShaderInfoLog(vertexShader));
-
-        var fs = @"
-            #version 330 core
-            in float redColor;
-            in vec2 texCoord;
-            
-            out vec4 color;
-
-            uniform sampler2D image1; 
-            uniform sampler2D image2; 
-
-            void main()
-            {
-                color = mix(texture(image1, texCoord), texture(image2, texCoord), 0.7f);
-            }";
-
-        var fragmentShader = context.CreateShader(ShaderType.FragmentShader);
-        context.ShaderSource(fragmentShader, fs);
-        context.CompileShader(fragmentShader);
-        Debug.Write(context.GetShaderInfoLog(fragmentShader));
-
-        shaderProgram = context.CreateProgram();
-        context.AttachShader(shaderProgram, vertexShader);
-        context.AttachShader(shaderProgram, fragmentShader);
-        context.LinkProgram(shaderProgram);
-        Debug.Write(context.GetProgramInfoLog(shaderProgram));
-
-        context.DetachShader(shaderProgram, vertexShader);
-        context.DeleteShader(vertexShader);
-        context.DetachShader(shaderProgram, fragmentShader);
-        context.DeleteShader(fragmentShader);
-
         texture1 = context.GenTexture();
         context.BindTexture(TextureTarget.Texture2D, texture1);
 
@@ -137,7 +82,7 @@ internal sealed class Quad : IDrawableGameObject
         context.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
         context.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
-        LoadImage(context, "wood.jpg");
+        LoadImage(context, "content\\images\\wood.jpg");
         context.GenerateMipmap(TextureTarget.Texture2D);
 
         texture2 = context.GenTexture();
@@ -148,7 +93,7 @@ internal sealed class Quad : IDrawableGameObject
         context.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.LinearMipmapLinear);
         context.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
-        LoadImage(context, "smile.jpg");
+        LoadImage(context, "content\\images\\smile.jpg");
         context.GenerateMipmap(TextureTarget.Texture2D);
     }
 
@@ -162,7 +107,7 @@ internal sealed class Quad : IDrawableGameObject
 
         context.Clear(ClearBufferMask.ColorBufferBit);
         context.ClearColor(Color.CadetBlue);
-        context.UseProgram(shaderProgram);
+        shader.Use();
 
         context.ActiveTexture(TextureUnit.Texture0);
         context.BindTexture(TextureTarget.Texture2D, texture1);

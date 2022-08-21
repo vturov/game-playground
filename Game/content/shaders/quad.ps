@@ -1,0 +1,13 @@
+﻿#version 330 core
+in float redColor;
+in vec2 texCoord;
+            
+out vec4 color;
+
+uniform sampler2D image1; 
+uniform sampler2D image2; 
+
+void main()
+{
+    color = mix(texture(image1, texCoord), texture(image2, texCoord), 0.7f);
+}

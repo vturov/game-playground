@@ -22,6 +22,7 @@ internal static class ServiceCollectionExtensions
             .AddSingleton<Func<ISceneDrawer>>(provider => provider.GetRequiredService<ISceneDrawer>)
             .AddTransient<QuadScene>()
             .AddTransient<Func<QuadScene>>(provider => provider.GetRequiredService<QuadScene>)
-            .AddTransient<Quad>();
+            .AddTransient<Quad>()
+            .AddTransient<ShaderProgram>();
     }
 }

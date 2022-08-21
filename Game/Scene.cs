@@ -75,10 +75,12 @@ namespace Game
             out float redColor;
             out vec2 texCoord;
 
-            uniform mat4 transform;
+            uniform mat4 model;
+            uniform mat4 view;
+            uniform mat4 projection;
 
             void main() {
-                gl_Position = transform * vec4(pos, 1);
+                gl_Position = projection * view * model * vec4(pos, 1);
                 redColor = red;
                 texCoord = tex;
             }";
@@ -171,12 +173,14 @@ namespace Game
             context.Uniform1(0, 0);
             context.Uniform1(1, 1);
 
-            var now = DateTime.Now;
-            var viewMatrix = Matrix4x4.CreateRotationX(0.14f) *
-                             Matrix4x4.CreateScale(0.7f * (now.Millisecond / 1000f)) *
-                             Matrix4x4.CreateTranslation(now.Millisecond / 1000f, 0, 0);
-            var matrixLocation = context.GetUniformLocation(shaderProgram, "transform");
-            context.UniformMatrix4(matrixLocation, 1, false, (float*)&viewMatrix);
+            var ms = Environment.TickCount / 1000f;
+            var z = (float)Math.Cos(ms) * 15 + 30;
+            var model = Matrix4x4.CreateScale(10);
+            var view = Matrix4x4.CreateLookAt(new Vector3(0, 0, z), Vector3.Zero, Vector3.UnitY);
+            var projection = Matrix4x4.CreatePerspectiveFieldOfView(3.14f / 2f, 1, 0.1f, 2000f);
+            context.UniformMatrix4(0, 1, false, (float*)&model);
+            context.UniformMatrix4(2, 1, false, (float*)&view);
+            context.UniformMatrix4(1, 1, false, (float*)&projection);
 
             context.BindVertexArray(vao);
             context.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, null);

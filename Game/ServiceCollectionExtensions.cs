@@ -12,7 +12,7 @@ internal static class ServiceCollectionExtensions
     {
         return services
             .AddSingleton<IHostedService, ApplicationHost>()
-            .AddSingleton<IGame, Game>()
+            .AddSingleton<IGame, Core.Game>()
             .AddSingleton(Window.Create(WindowOptions.Default))
             .AddSingleton(provider => provider.GetRequiredService<IWindow>().CreateOpenGL())
             .AddSingleton<ISceneManager, SceneManager>()

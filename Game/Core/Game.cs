@@ -44,7 +44,7 @@ internal sealed class Game : IGame
     {
         window.Load -= OnWindowLoaded;
 
-        createSceneDrawer();
         sceneManager.Initialize();
+        createSceneDrawer();
     }
 }

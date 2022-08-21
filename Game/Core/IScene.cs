@@ -2,4 +2,5 @@
 
 internal interface IScene
 {
+    IEnumerable<IGameObject> Objects { get; }
 }

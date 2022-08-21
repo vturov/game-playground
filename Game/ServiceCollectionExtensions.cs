@@ -13,10 +13,15 @@ internal static class ServiceCollectionExtensions
         return services
             .AddSingleton<IHostedService, ApplicationHost>()
             .AddSingleton<IGame, Core.Game>()
-            .AddSingleton(Window.Create(WindowOptions.Default))
-            .AddSingleton(provider => provider.GetRequiredService<IWindow>().CreateOpenGL())
-            .AddSingleton<ISceneManager, SceneManager>()
+            .AddSingleton<IWindow>(Window.Create(WindowOptions.Default))
+            .AddSingleton<GL>(provider => provider.GetRequiredService<IWindow>().CreateOpenGL())
+            .AddSingleton<SceneManager>()
+            .AddSingleton<ISceneManager>(provider => provider.GetRequiredService<SceneManager>())
+            .AddSingleton<ISceneProvider>(provider => provider.GetRequiredService<SceneManager>())
             .AddSingleton<ISceneDrawer, SceneDrawer>()
-            .AddSingleton<Func<ISceneDrawer>>(provider => provider.GetRequiredService<ISceneDrawer>);
+            .AddSingleton<Func<ISceneDrawer>>(provider => provider.GetRequiredService<ISceneDrawer>)
+            .AddTransient<QuadScene>()
+            .AddTransient<Func<QuadScene>>(provider => provider.GetRequiredService<QuadScene>)
+            .AddTransient<Quad>();
     }
 }

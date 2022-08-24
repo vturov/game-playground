@@ -1,6 +1,7 @@
 ﻿using Game.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
@@ -14,6 +15,7 @@ internal static class ServiceCollectionExtensions
             .AddSingleton<IHostedService, ApplicationHost>()
             .AddSingleton<IGame, Core.Game>()
             .AddSingleton<IWindow>(Window.Create(WindowOptions.Default))
+            .AddSingleton<IInputContext>(provider => provider.GetRequiredService<IWindow>().CreateInput())
             .AddSingleton<GL>(provider => provider.GetRequiredService<IWindow>().CreateOpenGL())
             .AddSingleton<SceneManager>()
             .AddSingleton<ISceneManager>(provider => provider.GetRequiredService<SceneManager>())
@@ -23,6 +25,7 @@ internal static class ServiceCollectionExtensions
             .AddTransient<QuadScene>()
             .AddTransient<Func<QuadScene>>(provider => provider.GetRequiredService<QuadScene>)
             .AddTransient<Quad>()
-            .AddTransient<ShaderProgram>();
+            .AddTransient<ShaderProgram>()
+            .AddTransient<Camera>();
     }
 }

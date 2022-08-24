@@ -36,6 +36,7 @@ internal sealed class Quad : IDrawableGameObject
 
     private readonly GL context;
     private readonly ShaderProgram shader;
+    private readonly Camera camera;
 
     private bool isInitialized;
     private uint vbo;
@@ -44,10 +45,11 @@ internal sealed class Quad : IDrawableGameObject
     private uint texture1;
     private uint texture2;
 
-    public Quad(GL context, ShaderProgram shader)
+    public Quad(GL context, ShaderProgram shader, Camera camera)
     {
         this.context = context;
         this.shader = shader;
+        this.camera = camera;
     }
 
     public unsafe void Initialize()
@@ -117,10 +119,8 @@ internal sealed class Quad : IDrawableGameObject
         context.Uniform1(0, 0);
         context.Uniform1(1, 1);
 
-        var ms = Environment.TickCount / 1000f;
-        var z = (float)Math.Cos(ms) * 15 + 30;
         var model = Matrix4x4.CreateScale(10);
-        var view = Matrix4x4.CreateLookAt(new Vector3(0, 0, z), Vector3.Zero, Vector3.UnitY);
+        var view = Matrix4x4.CreateLookAt(camera.Position, camera.Target, camera.Up);
         var projection = Matrix4x4.CreatePerspectiveFieldOfView(3.14f / 2f, 1, 0.1f, 2000f);
         context.UniformMatrix4(0, 1, false, (float*)&model);
         context.UniformMatrix4(2, 1, false, (float*)&view);

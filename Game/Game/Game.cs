@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Silk.NET.Windowing;
 
-namespace Game.Core;
+namespace Game.Game;
 
 internal sealed class Game : IGame
 {
@@ -38,7 +38,7 @@ internal sealed class Game : IGame
         window.Load -= OnWindowLoaded;
 
         var components = serviceProvider.GetServices<IGameComponent>();
-        foreach (var component in components)
+        foreach (var component in components.OfType<IInitializable>())
             component.Initialize();
     }
 

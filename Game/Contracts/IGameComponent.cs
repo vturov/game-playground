@@ -2,5 +2,4 @@
 
 internal interface IGameComponent
 {
-    void Initialize();
 }

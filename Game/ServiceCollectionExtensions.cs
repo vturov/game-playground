@@ -1,5 +1,6 @@
 ﻿using Game.Contracts;
 using Game.Core;
+using Game.Game;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Silk.NET.Input;
@@ -21,7 +22,7 @@ internal static class ServiceCollectionExtensions
     {
         return services
             .AddSingleton<IHostedService, ApplicationHost>()
-            .AddSingleton<IGame, Core.Game>()
+            .AddSingleton<IGame, Game.Game>()
             .AddSingleton(Window.Create(WindowOptions.Default))
             .AddSingleton(provider => provider.GetRequiredService<IWindow>().CreateInput())
             .AddSingleton(provider => provider.GetRequiredService<IWindow>().CreateOpenGL());
@@ -30,6 +31,7 @@ internal static class ServiceCollectionExtensions
     private static IServiceCollection AddGameComponents(this IServiceCollection services)
     {
         return services
-            .AddSingleton<IGameComponent, SceneDrawer>();
+            .AddSingleton<IGameComponent, SceneDrawer>()
+            .AddSingleton<IGameComponent, EscapeHandler>();
     }
 }

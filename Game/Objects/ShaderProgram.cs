@@ -42,12 +42,14 @@ internal sealed class ShaderProgram
         id = context.CreateProgram();
         context.AttachShader(id, vertexShader);
         context.AttachShader(id, fragmentShader);
+
         context.LinkProgram(id);
         Debug.Write(context.GetProgramInfoLog(id));
 
         context.DetachShader(id, vertexShader);
-        context.DeleteShader(vertexShader);
         context.DetachShader(id, fragmentShader);
+
+        context.DeleteShader(vertexShader);
         context.DeleteShader(fragmentShader);
     }
 }

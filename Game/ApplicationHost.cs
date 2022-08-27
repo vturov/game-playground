@@ -1,4 +1,4 @@
-﻿using Game.Core;
+﻿using Game.Contracts;
 using Microsoft.Extensions.Hosting;
 
 namespace Game;

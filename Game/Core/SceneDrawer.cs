@@ -1,34 +1,15 @@
-﻿using Silk.NET.Windowing;
+﻿using Game.Contracts;
 
 namespace Game.Core;
 
-internal sealed class SceneDrawer : ISceneDrawer, IDisposable
+internal sealed class SceneDrawer : IGameComponent
 {
-    private readonly IWindow window;
-    private readonly ISceneProvider sceneProvider;
-
-    public SceneDrawer(IWindow window, ISceneProvider sceneProvider)
+    public SceneDrawer()
     {
-        this.window = window;
-        this.sceneProvider = sceneProvider;
-
-        window.Render += OnWindowRendered;
     }
 
-    private void OnWindowRendered(double delta)
+    public void Initialize()
     {
-        var scene = sceneProvider.Scene;
-        if (scene is null)
-            return;
-
-        foreach (var drawableObject in scene.Objects.OfType<IDrawableGameObject>())
-        {
-            drawableObject.Draw(delta);
-        }
-    }
-
-    public void Dispose()
-    {
-        window.Render -= OnWindowRendered;
+        throw new NotImplementedException();
     }
 }

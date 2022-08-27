@@ -1,11 +1,13 @@
 ﻿using System.Numerics;
+using Game.Contracts.Objects;
+using Game.Core;
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Color = System.Drawing.Color;
 
-namespace Game.Core;
+namespace Game.Objects;
 
 internal sealed class Quad : IDrawableGameObject
 {

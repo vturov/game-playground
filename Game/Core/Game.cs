@@ -1,18 +1,18 @@
-﻿using Silk.NET.Windowing;
+﻿using Game.Contracts;
+using Microsoft.Extensions.DependencyInjection;
+using Silk.NET.Windowing;
 
 namespace Game.Core;
 
 internal sealed class Game : IGame
 {
     private readonly IWindow window;
-    private readonly ISceneManager sceneManager;
-    private readonly Func<ISceneDrawer> createSceneDrawer;
+    private readonly IServiceProvider serviceProvider;
 
-    public Game(IWindow window, ISceneManager sceneManager, Func<ISceneDrawer> createSceneDrawer)
+    public Game(IWindow window, IServiceProvider serviceProvider)
     {
         this.window = window;
-        this.sceneManager = sceneManager;
-        this.createSceneDrawer = createSceneDrawer;
+        this.serviceProvider = serviceProvider;
 
         window.Closing += OnWindowClosing;
         window.Load += OnWindowLoaded;
@@ -33,18 +33,19 @@ internal sealed class Game : IGame
         window.Close();
     }
 
+    private void OnWindowLoaded()
+    {
+        window.Load -= OnWindowLoaded;
+
+        var components = serviceProvider.GetServices<IGameComponent>();
+        foreach (var component in components)
+            component.Initialize();
+    }
+
     private void OnWindowClosing()
     {
         window.Closing -= OnWindowClosing;
 
         Exited?.Invoke();
-    }
-
-    private void OnWindowLoaded()
-    {
-        window.Load -= OnWindowLoaded;
-
-        sceneManager.Initialize();
-        createSceneDrawer();
     }
 }

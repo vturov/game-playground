@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Silk.NET.OpenGL;
 
-namespace Game.Core;
+namespace Game.Objects.old;
 
 internal sealed class ShaderProgram
 {

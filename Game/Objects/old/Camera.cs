@@ -1,10 +1,10 @@
-﻿using Game.Contracts.Objects;
+﻿using Game.Contracts;
 using Silk.NET.Input;
 using System.Numerics;
 
-namespace Game.Core;
+namespace Game.Objects.old;
 
-internal sealed class Camera : IGameObject
+internal sealed class Camera : IObject
 {
     private readonly IInputContext input;
 
@@ -27,7 +27,7 @@ internal sealed class Camera : IGameObject
     private void OnKeyDown(IKeyboard keyboard, Key key, int arg3)
     {
         var addition = Vector3.Zero;
-        
+
         if (key == Key.W)
             addition.Z = -1;
         else if (key == Key.S)
@@ -49,4 +49,6 @@ internal sealed class Camera : IGameObject
         direction = Vector3.Normalize(direction);
         Up = Vector3.Cross(direction, Vector3.UnitX);
     }
+
+    public IReadOnlyCollection<IObjectComponent> Components { get; }
 }

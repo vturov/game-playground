@@ -1,15 +1,13 @@
 ﻿using System.Numerics;
-using Game.Contracts.Objects;
-using Game.Core;
 using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Color = System.Drawing.Color;
 
-namespace Game.Objects;
+namespace Game.Objects.old;
 
-internal sealed class Quad : IDrawableGameObject
+internal sealed class QuadOld
 {
     private readonly float[] vertices =
     {
@@ -47,7 +45,7 @@ internal sealed class Quad : IDrawableGameObject
     private uint texture1;
     private uint texture2;
 
-    public Quad(GL context, ShaderProgram shader, Camera camera)
+    public QuadOld(GL context, ShaderProgram shader, Camera camera)
     {
         this.context = context;
         this.shader = shader;

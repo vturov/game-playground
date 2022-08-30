@@ -1,8 +1,9 @@
 ﻿using Game.Contracts;
+using Game.Objects;
 using Microsoft.Extensions.DependencyInjection;
 using Silk.NET.Windowing;
 
-namespace Game.Game;
+namespace Game;
 
 internal sealed class Game : IGame
 {
@@ -33,13 +34,17 @@ internal sealed class Game : IGame
         window.Close();
     }
 
+    private void Initialize()
+    {
+        var objectManager = serviceProvider.GetRequiredService<IObjectManager>();
+        objectManager.Create<SceneLoader>();
+    }
+
     private void OnWindowLoaded()
     {
         window.Load -= OnWindowLoaded;
 
-        var components = serviceProvider.GetServices<IGameComponent>();
-        foreach (var component in components.OfType<IInitializable>())
-            component.Initialize();
+        Initialize();
     }
 
     private void OnWindowClosing()

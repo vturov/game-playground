@@ -1,12 +1,11 @@
 ﻿using Game.Contracts;
-using Game.Handlers;
 using Game.Objects;
-using Game.Objects.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
+using System.Reflection;
 
 namespace Game.Extensions;
 
@@ -31,17 +30,48 @@ internal static class ServiceCollectionExtensions
     }
     private static IServiceCollection AddGameObjectManagement(this IServiceCollection services)
     {
-        return services
-            .AddSingleton<IObjectManager, ObjectManager>()
-            .AddSingleton<IObjectComponentManager, ObjectComponentManager>()
-            .AddSingleton<IObjectComponentFactory, ObjectComponentFactory>()
-            .AddSingleton<IObjectComponentCreationHandler<KeyboardInput>, InputComponentsHandler>();
+        services
+           .AddSingleton<IObjectManager, ObjectManager>()
+           .AddSingleton<IObjectComponentManager, ObjectComponentManager>()
+           .AddSingleton<IObjectComponentFactory, ObjectComponentFactory>();
+
+        var handlerBaseType = typeof(IObjectComponentCreationHandler<>);
+        var typeToRegister = Assembly
+            .GetExecutingAssembly()
+            .GetTypes()
+            .Where(handlerType => handlerType.IsAbstract is false)
+            .Select(handlerType =>
+                new
+                {
+                    HandlerType = handlerType,
+                    ImplementedInterfaces =
+                        handlerType
+                            .GetInterfaces()
+                            .Where(baseType => baseType.IsGenericType &&
+                                               baseType.GetGenericTypeDefinition() == handlerBaseType)
+                });
+
+        foreach (var type in typeToRegister)
+        {
+            services.AddSingleton(type.HandlerType);
+
+            foreach (var implementedInterface in type.ImplementedInterfaces)
+                services.AddSingleton(implementedInterface, provider => provider.GetRequiredService(type.HandlerType));
+        }
+
+        return services;
     }
 
     private static IServiceCollection AddGameObjects(this IServiceCollection services)
     {
-        return services
-            .AddTransient<EscapeHandler>()
-            .AddTransient<SceneLoader>();
+        var objectTypes = Assembly
+            .GetExecutingAssembly()
+            .GetTypes()
+            .Where(x => !x.IsAbstract && x.IsAssignableTo(typeof(IObject)));
+
+        foreach (var type in objectTypes)
+            services.AddTransient(type);
+
+        return services;
     }
 }
